@@ -17,10 +17,11 @@ import AIRecommendationPopup from './components/AIRecommendationPopup';
 import SmartRecommendationPopup from './components/SmartRecommendationPopup';
 import LoginModal from './components/LoginModal';
 import RegistrationModal from './components/RegistrationModal';
+import InstagramSetupModal from './components/InstagramSetupModal';
 import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, PageType } from './types';
 
 function App() {
-  const { user, userProfile, loading: authLoading, login, loginWithGoogle, register, logout } = useAuth();
+  const { user, userProfile, loading: authLoading, login, loginWithGoogle, register, logout, updateInstagramInfo } = useAuth();
   const { 
     brands, 
     influencers, 
@@ -49,6 +50,8 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [registerUserType, setRegisterUserType] = useState<UserType>('influencer');
   const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
+  const [showInstagramSetup, setShowInstagramSetup] = useState(false);
+  const [instagramSetupLoading, setInstagramSetupLoading] = useState(false);
 
   // Get user type from profile
   const userType = userProfile?.userType || null;
@@ -141,9 +144,11 @@ function App() {
       await loginWithGoogle();
       setShowLogin(false);
       
-      // Show welcome message
+      // Show welcome message and Instagram setup
       setTimeout(() => {
         alert(`Welcome to SponsorLoop! 🎉`);
+        // Show Instagram setup modal for new Google users
+        setShowInstagramSetup(true);
       }, 500);
     } catch (error) {
       console.error('Google login failed:', error);
@@ -332,6 +337,24 @@ function App() {
     setCurrentPage('home');
   };
 
+  const handleInstagramSetup = async (instagramData: { username: string; url: string }) => {
+    setInstagramSetupLoading(true);
+    
+    try {
+      await updateInstagramInfo(instagramData);
+      setShowInstagramSetup(false);
+      
+      // Show success message
+      setTimeout(() => {
+        alert(`Instagram connected successfully! @${instagramData.username} 🎉`);
+      }, 500);
+    } catch (error) {
+      console.error('Instagram setup failed:', error);
+      alert('Failed to connect Instagram. Please try again.');
+    } finally {
+      setInstagramSetupLoading(false);
+    }
+  };
   const renderCurrentPage = () => {
     if (!userType) {
       return (
@@ -480,6 +503,14 @@ function App() {
       onClose={() => setShowRegister(false)}
       userType={registerUserType}
       onRegister={handleRegister}
+    />
+
+    <InstagramSetupModal
+      isOpen={showInstagramSetup}
+      onClose={() => setShowInstagramSetup(false)}
+      onSubmit={handleInstagramSetup}
+      userType={userProfile?.userType || 'influencer'}
+      isLoading={instagramSetupLoading}
     />
     </div>
   );

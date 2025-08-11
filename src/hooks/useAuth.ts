@@ -60,6 +60,18 @@ export const useAuth = () => {
     }
   };
 
+  const updateInstagramInfo = async (instagramData: { username: string; url: string }) => {
+    if (!user) throw new Error('No user logged in');
+    
+    try {
+      await firebaseAuth.updateInstagramInfo(user.uid, instagramData);
+      // Refresh user profile
+      const updatedProfile = await firebaseAuth.getUserProfile(user.uid);
+      setUserProfile(updatedProfile);
+    } catch (error) {
+      throw error;
+    }
+  };
   return {
     user,
     userProfile,
@@ -67,6 +79,7 @@ export const useAuth = () => {
     login,
     loginWithGoogle,
     register,
-    logout
+    logout,
+    updateInstagramInfo
   };
 };

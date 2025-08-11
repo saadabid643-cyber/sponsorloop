@@ -201,13 +201,14 @@ class FirebaseAuthService {
           website: '',
           phone: '',
           avatar: result.user.photoURL || '',
+          instagramHandle: '', // Will be filled in setup modal
+          instagramUrl: '',
           createdAt: new Date(),
           updatedAt: new Date(),
           // Influencer defaults
           niche: ['Lifestyle'],
           followers: 0,
           engagement: 3.5,
-          instagramHandle: '',
           twitterHandle: '',
           linkedinHandle: '',
           priceRange: {
@@ -295,6 +296,22 @@ class FirebaseAuthService {
     }
   }
 
+  // Update Instagram information
+  async updateInstagramInfo(uid: string, instagramData: { username: string; url: string }): Promise<void> {
+    try {
+      const docRef = doc(db, 'users', uid);
+      await setDoc(docRef, {
+        instagramHandle: instagramData.username,
+        instagramUrl: instagramData.url,
+        updatedAt: new Date(),
+      }, { merge: true });
+      
+      console.log('Instagram info updated successfully');
+    } catch (error) {
+      console.error('Update Instagram info error:', error);
+      throw error;
+    }
+  }
   // Get current user
   getCurrentUser(): User | null {
     return auth.currentUser;
