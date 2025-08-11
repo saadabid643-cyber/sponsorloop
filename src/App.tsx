@@ -204,49 +204,6 @@ function App() {
     );
   }
 
-  const handleLogin = (email: string, password: string, selectedUserType: UserType) => {
-    handleLogin(email, password);
-  };
-
-  const handleRegister = (userData: any) => {
-    handleRegister(userData);
-  };
-
-  const handleLogin = async (email: string, password: string) => {
-    try {
-      await login(email, password);
-    setShowLogin(false);
-    
-    // Show welcome message
-    setTimeout(() => {
-      alert(`Welcome back! 🎉`);
-    }, 500);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
-  };
-
-  const handleRegister = async (userData: any) => {
-    try {
-      await register(userData.email, userData.password, registerUserType, userData);
-    setShowRegister(false);
-    
-    // Show welcome message
-    setTimeout(() => {
-      alert(`Welcome to SponsorLoop! 🎉 Your account has been created successfully.`);
-      // Trigger AI recommendations after registration
-      // Trigger smart recommendations after registration
-      setTimeout(() => {
-        setShowSmartRecommendations(true);
-      }, 2000);
-    }, 500);
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
-    }
-  };
-
   const handleProfileClick = (profile: Brand | Influencer) => {
     setSelectedProfile(profile);
   };
