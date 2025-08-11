@@ -60,21 +60,8 @@ function App() {
   // Load initial data when user logs in
   useEffect(() => {
     if (user && userType) {
-      // Load brands and influencers with error handling
-      fetchBrands().catch(error => {
-        console.error('Failed to fetch brands:', error);
-      });
-      fetchInfluencers().catch(error => {
-        console.error('Failed to fetch influencers:', error);
-      });
-      
-      // Load user-specific data with error handling
-      fetchUserCollaborations(user.uid).catch(error => {
-        console.error('Failed to fetch collaborations:', error);
-      });
-      fetchUserConversations(user.uid).catch(error => {
-        console.error('Failed to fetch conversations:', error);
-      });
+      console.log('User logged in with type:', userType);
+      // Skip data loading for now to focus on Instagram setup
     }
   }, [user, userType]);
 
@@ -150,15 +137,18 @@ function App() {
 
   const handleGoogleLogin = async () => {
     try {
-      await loginWithGoogle();
+      console.log('Starting Google login process...');
+      const result = await loginWithGoogle();
+      console.log('Google login result:', result);
+      
       setShowLogin(false);
       
-      // Show welcome message and Instagram setup
+      // Always show Instagram setup for Google users
+      console.log('Showing Instagram setup modal...');
       setTimeout(() => {
-        alert(`Welcome to SponsorLoop! 🎉`);
-        // Show Instagram setup modal for new Google users
         setShowInstagramSetup(true);
-      }, 500);
+      }, 100);
+      
     } catch (error) {
       console.error('Google login failed:', error);
       alert('Google login failed. Please try again.');
@@ -361,12 +351,14 @@ function App() {
     setInstagramSetupLoading(true);
     
     try {
+      console.log('Updating Instagram info:', instagramData);
       await updateInstagramInfo(instagramData);
       setShowInstagramSetup(false);
       
       // Show success message
       setTimeout(() => {
-        alert(`Instagram connected successfully! @${instagramData.username} 🎉`);
+        console.log('Instagram setup completed successfully');
+        alert(`Welcome to SponsorLoop! Instagram @${instagramData.username} connected successfully! 🎉`);
       }, 500);
     } catch (error) {
       console.error('Instagram setup failed:', error);

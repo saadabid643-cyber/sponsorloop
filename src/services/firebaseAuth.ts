@@ -188,11 +188,16 @@ class FirebaseAuthService {
   // Google Sign In
   async signInWithGoogle(): Promise<UserCredential> {
     try {
+      console.log('Starting Google sign-in...');
       const result = await signInWithPopup(auth, this.googleProvider);
+      console.log('Google sign-in successful:', result.user.email);
       
       // Check if user profile exists, if not create one
+      console.log('Checking for existing profile...');
       const existingProfile = await this.getUserProfile(result.user.uid);
+      
       if (!existingProfile) {
+        console.log('Creating new profile for Google user...');
         // Create a basic profile for Google users
         const userProfile: Partial<BrandProfile | InfluencerProfile> = {
           uid: result.user.uid,
@@ -205,8 +210,6 @@ class FirebaseAuthService {
           website: '',
           phone: '',
           avatar: result.user.photoURL || '',
-          instagramHandle: '', // Will be filled in setup modal
-          instagramUrl: '',
           createdAt: new Date(),
           updatedAt: new Date(),
           // Influencer defaults
@@ -223,7 +226,11 @@ class FirebaseAuthService {
           rating: 5.0,
         };
 
+        console.log('Saving new Google user profile...');
         await setDoc(doc(db, 'users', result.user.uid), userProfile);
+        console.log('Profile saved successfully');
+      } else {
+        console.log('Existing profile found');
       }
       
       return result;
@@ -256,10 +263,12 @@ class FirebaseAuthService {
   // Get user profile
   async getUserProfile(uid: string): Promise<BrandProfile | InfluencerProfile | null> {
     try {
+      console.log('Fetching user profile for:', uid);
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
+        console.log('Profile found in Firestore');
         const data = docSnap.data();
         return {
           ...data,
@@ -267,9 +276,15 @@ class FirebaseAuthService {
           updatedAt: data.updatedAt?.toDate() || new Date(),
         } as BrandProfile | InfluencerProfile;
       }
+      console.log('No profile found in Firestore');
       return null;
     } catch (error) {
       console.error('Get profile error:', error);
+      // Don't throw error for offline issues, return null instead
+      if (error instanceof Error && error.message.includes('offline')) {
+        console.log('Client is offline, returning null profile');
+        return null;
+      }
       throw error;
     }
   }
@@ -303,6 +318,7 @@ class FirebaseAuthService {
   // Update Instagram information
   async updateInstagramInfo(uid: string, instagramData: { username: string; url: string }): Promise<void> {
     try {
+      console.log('Updating Instagram info for user:', uid, instagramData);
       const docRef = doc(db, 'users', uid);
       await setDoc(docRef, {
         instagramHandle: instagramData.username,

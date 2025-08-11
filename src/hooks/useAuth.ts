@@ -23,7 +23,10 @@ export const useAuth = () => {
           setUserProfile(profile);
         } catch (error) {
           console.error('Error fetching user profile:', error);
-          setError('Failed to load user profile');
+          // Don't set error for offline issues
+          if (!(error instanceof Error && error.message.includes('offline'))) {
+            setError('Failed to load user profile');
+          }
         }
       } else {
         setUserProfile(null);
@@ -51,7 +54,9 @@ export const useAuth = () => {
     try {
       setError(null);
       console.log('Attempting Google login...');
-      await firebaseAuth.signInWithGoogle();
+      const result = await firebaseAuth.signInWithGoogle();
+      console.log('Google login completed successfully');
+      return result;
     } catch (error) {
       console.error('Google login error:', error);
       setError(error instanceof Error ? error.message : 'Google login failed');
