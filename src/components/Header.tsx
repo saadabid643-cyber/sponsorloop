@@ -132,7 +132,27 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           )}
 
-          {/* User Menu */}
+          {/* Auth Buttons for Non-Logged In Users */}
+          {!currentUser && (
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={onShowLogin}
+                className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-purple-600 rounded-xl font-medium transition-all duration-200 hover:bg-purple-50"
+              >
+                <LogIn size={18} />
+                <span>Sign In</span>
+              </button>
+              <button
+                onClick={() => onShowRegister('influencer')}
+                className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                <UserPlus size={18} />
+                <span>Join Free</span>
+              </button>
+            </div>
+          )}
+
+          {/* User Menu for Logged In Users */}
           {currentUser && (
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
