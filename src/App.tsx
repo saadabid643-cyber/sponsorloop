@@ -151,7 +151,15 @@ function App() {
       
     } catch (error) {
       console.error('Google login failed:', error);
-      alert('Google login failed. Please try again.');
+      
+      let errorMessage = 'Google login failed. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('Database access denied') || error.message.includes('permissions')) {
+          errorMessage = '🚨 Database Error: Please update Firestore security rules in Firebase Console to allow authenticated users. Check the console for details.';
+        }
+      }
+      
+      alert(errorMessage);
     }
   };
   const handleRegister = async (userData: any) => {

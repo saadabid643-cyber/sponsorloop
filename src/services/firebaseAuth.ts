@@ -295,9 +295,170 @@ class FirebaseAuthService {
       return null;
     } catch (error) {
       console.error('❌ Get profile error from Cloud Firestore:', error);
-      // Don't throw error for offline issues, return null instead
-      if (error instanceof Error && error.message.includes('offline')) {
-        console.log('📡 Client is offline, returning null profile');
+      
+      // Handle specific Firebase errors
+      if (error instanceof Error) {
+        if (error.message.includes('Missing or insufficient permissions')) {
+          console.error('🚨 FIRESTORE SECURITY RULES ERROR: Please update Firestore rules to allow authenticated access');
+          console.error('🔧 Go to Firebase Console → Firestore → Rules and allow authenticated users');
+          return null;
+        }
+        if (error.message.includes('offline')) {
+          console.log('📡 Client is offline, returning null profile');
+          return null;
+        }
+      }
+      
+      // For other errors, still return null to prevent crashes
+      console.error('🔄 Returning null profile due to error, but continuing...');
+      return null;
+    }
+  }
+
+  // Create user profile with better error handling
+  async createUserProfile(uid: string, profileData: Partial<BrandProfile | InfluencerProfile>): Promise<void> {
+    try {
+      console.log('💾 Creating user profile in Cloud Firestore...');
+      const docRef = doc(db, 'users', uid);
+      await setDoc(docRef, profileData, { merge: true });
+      console.log('✅ Profile created successfully in Cloud Firestore');
+      
+      // Verify the data was saved
+      const savedDoc = await getDoc(docRef);
+      if (savedDoc.exists()) {
+        console.log('✅ Profile verification successful');
+      } else {
+        console.log('❌ Profile verification failed');
+      }
+    } catch (error) {
+      console.error('❌ Create profile error:', error);
+      
+      if (error instanceof Error && error.message.includes('Missing or insufficient permissions')) {
+        console.error('🚨 FIRESTORE SECURITY RULES ERROR: Cannot create profile');
+        throw new Error('Database permissions error. Please check Firestore security rules.');
+      }
+      
+      throw error;
+    }
+  }
+
+  // Google Sign In with better error handling
+  async signInWithGoogle(): Promise<UserCredential> {
+    try {
+      console.log('Starting Google sign-in...');
+      const result = await signInWithPopup(auth, this.googleProvider);
+      console.log('Google sign-in successful:', result.user.email);
+      
+      // Check if user profile exists, if not create one
+      console.log('Checking for existing profile...');
+      const existingProfile = await this.getUserProfile(result.user.uid);
+      
+      if (!existingProfile) {
+        console.log('Creating new profile for Google user...');
+        // Create a basic profile for Google users
+        const userProfile: Partial<BrandProfile | InfluencerProfile> = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          userType: 'influencer', // Default to influencer, can be changed later
+          name: result.user.displayName || 'Google User',
+          username: result.user.email?.split('@')[0] || 'user',
+          bio: '',
+          location: '',
+          website: '',
+          phone: '',
+          avatar: result.user.photoURL || '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          // Influencer defaults
+          niche: ['Lifestyle'],
+          followers: 0,
+          engagement: 3.5,
+          instagramHandle: '',
+          twitterHandle: '',
+          linkedinHandle: '',
+          priceRange: {
+            post: 100,
+            story: 50,
+            reel: 150,
+          },
+          rating: 5.0,
+        };
+
+        console.log('Saving new Google user profile...');
+        await this.createUserProfile(result.user.uid, userProfile);
+        console.log('Profile saved successfully');
+      } else {
+        console.log('Existing profile found');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      
+      if (error instanceof Error && error.message.includes('Missing or insufficient permissions')) {
+        throw new Error('Database access denied. Please check Firestore security rules in Firebase Console.');
+      }
+      
+      throw error;
+    }
+  }
+
+  // Update user profile with better error handling
+  async updateUserProfile(uid: string, updates: Partial<BrandProfile | InfluencerProfile>): Promise<void> {
+    try {
+      console.log('🔄 Updating user profile in Cloud Firestore...');
+      const docRef = doc(db, 'users', uid);
+      await setDoc(docRef, {
+        ...updates,
+        updatedAt: new Date(),
+      }, { merge: true });
+      console.log('✅ Profile updated successfully');
+    } catch (error) {
+      console.error('❌ Update profile error:', error);
+      
+      if (error instanceof Error && error.message.includes('Missing or insufficient permissions')) {
+        throw new Error('Database permissions error. Please check Firestore security rules.');
+      }
+      
+      throw error;
+    }
+  }
+
+  // Update Instagram information with better error handling
+  async updateInstagramInfo(uid: string, instagramData: { username: string; url: string }): Promise<void> {
+    try {
+      console.log('📸 Updating Instagram info in Cloud Firestore for user:', uid, instagramData);
+      const docRef = doc(db, 'users', uid);
+      await setDoc(docRef, {
+        instagramHandle: instagramData.username,
+        instagramUrl: instagramData.url,
+        updatedAt: new Date(),
+      }, { merge: true });
+      
+      console.log('✅ Instagram info updated successfully in Cloud Firestore');
+      
+      // Verify the Instagram data was saved
+      console.log('🔍 Verifying Instagram data was saved...');
+      const updatedDoc = await getDoc(docRef);
+      if (updatedDoc.exists()) {
+        const data = updatedDoc.data();
+        console.log('✅ Instagram data verification successful:', {
+          instagramHandle: data.instagramHandle,
+          instagramUrl: data.instagramUrl
+        });
+      } else {
+        console.log('❌ Instagram data verification failed');
+      }
+    } catch (error) {
+      console.error('❌ Update Instagram info error:', error);
+      
+      if (error instanceof Error && error.message.includes('Missing or insufficient permissions')) {
+        throw new Error('Database permissions error. Cannot save Instagram info. Please check Firestore security rules.');
+      }
+      
+      throw error;
+    }
+  }
         return null;
       }
       throw error;
