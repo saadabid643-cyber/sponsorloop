@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({
   onToggleChat, 
   isChatOpen, 
   onToggleCart, 
-  cartItemCount 
+  cartItemCount,
   onLogout,
   currentUser
 }) => {
