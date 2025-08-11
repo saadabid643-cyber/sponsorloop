@@ -9,8 +9,47 @@ interface HeroProps {
 }
 
 const Hero: React.FC<HeroProps> = ({ onSelectUserType, onShowLogin, onShowRegister }) => {
+  const showFirestoreRulesError = () => {
+    const errorMessage = `🚨 FIRESTORE SECURITY RULES ERROR
+
+Your database is blocking all access. To fix this:
+
+1. Go to: https://console.firebase.google.com/project/sponsorloop-b0321
+2. Click "Firestore Database" → "Rules"  
+3. Replace ALL rules with:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+4. Click "Publish"
+5. Wait 2 minutes, then refresh this page
+
+The app will NOT work until you fix the rules!`;
+    
+    alert(errorMessage);
+  };
+
   return (
     <div className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-white to-purple-50">
+      {/* Firestore Rules Warning Banner */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+        <div className="bg-red-600 text-white px-6 py-3 rounded-full shadow-lg animate-pulse">
+          <button 
+            onClick={showFirestoreRulesError}
+            className="flex items-center space-x-2 hover:underline"
+          >
+            <span className="text-lg">🚨</span>
+            <span className="font-semibold">Database Rules Need Fixing - Click Here</span>
+          </button>
+        </div>
+      </div>
+
       {/* Top Banner */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-purple-200 shadow-lg">

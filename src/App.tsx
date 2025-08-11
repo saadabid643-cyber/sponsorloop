@@ -162,6 +162,35 @@ function App() {
       alert(errorMessage);
     }
   };
+
+  // Show Firestore rules error prominently
+  const showFirestoreRulesError = () => {
+    const errorMessage = `
+🚨 FIRESTORE SECURITY RULES ERROR
+
+Your database is blocking all access. To fix this:
+
+1. Go to: https://console.firebase.google.com/project/sponsorloop-b0321
+2. Click "Firestore Database" → "Rules"
+3. Replace ALL rules with:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+
+4. Click "Publish"
+5. Wait 2 minutes, then refresh this page
+
+The app will NOT work until you fix the rules!
+    `;
+    
+    alert(errorMessage);
+  };
   const handleRegister = async (userData: any) => {
     try {
       await register(userData.email, userData.password, registerUserType, userData);
@@ -229,11 +258,23 @@ function App() {
           <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900">Loading SponsorLoop...</h2>
           {authError && (
-            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl max-w-md mx-auto">
+            <div className="mt-4 p-6 bg-red-50 border-2 border-red-300 rounded-xl max-w-lg mx-auto">
+              <h3 className="text-lg font-bold text-red-900 mb-2">🚨 Database Error</h3>
               <p className="text-red-700 text-sm">{authError}</p>
-              <button 
-                onClick={() => window.location.reload()} 
-                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+              <div className="mt-4 space-y-2">
+                <button 
+                  onClick={showFirestoreRulesError}
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors font-semibold"
+                >
+                  🔧 Show Fix Instructions
+                </button>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 transition-colors"
+                >
+                  Retry After Fixing Rules
+                </button>
+              </div>
               >
                 Retry
               </button>
