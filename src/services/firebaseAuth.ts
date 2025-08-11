@@ -149,7 +149,7 @@ class FirebaseAuthService {
 
       // Save to Firestore
       console.log('Saving profile to Firestore...');
-      await setDoc(doc(db, 'users', user.uid), userProfile);
+      await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
       console.log('Profile saved to Firestore successfully');
 
       // Update Firebase Auth profile
@@ -174,6 +174,10 @@ class FirebaseAuthService {
           throw new Error('Please enter a valid email address.');
         } else if (error.message.includes('auth/configuration-not-found')) {
           throw new Error('Firebase Authentication is not properly configured. Please contact support.');
+        } else if (error.message.includes('permission-denied')) {
+          throw new Error('Permission denied. Please check Firestore security rules.');
+        } else if (error.message.includes('unavailable')) {
+          throw new Error('Service temporarily unavailable. Please try again.');
         }
       }
       

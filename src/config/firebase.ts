@@ -1,11 +1,11 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyBYour_API_Key_Here",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "sponsorloop-b0321.firebaseapp.com",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "sponsorloop-b0321",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "sponsorloop-b0321.firebasestorage.app",
@@ -14,6 +14,12 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-V8CK3M9FND"
 };
 
+console.log('Firebase Config:', {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+  hasApiKey: !!firebaseConfig.apiKey
+});
+
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -21,6 +27,11 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Add connection state logging
+auth.onAuthStateChanged((user) => {
+  console.log('Auth state changed:', user ? `User: ${user.email}` : 'No user');
+});
 
 // Initialize Analytics only if supported (avoids issues in some environments)
 let analytics;

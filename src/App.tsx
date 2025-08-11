@@ -21,13 +21,14 @@ import InstagramSetupModal from './components/InstagramSetupModal';
 import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, PageType } from './types';
 
 function App() {
-  const { user, userProfile, loading: authLoading, login, loginWithGoogle, register, logout, updateInstagramInfo } = useAuth();
+  const { user, userProfile, loading: authLoading, error: authError, login, loginWithGoogle, register, logout, updateInstagramInfo } = useAuth();
   const { 
     brands, 
     influencers, 
     collaborations, 
     conversations,
     loading: dataLoading,
+    error: dataError,
     fetchBrands,
     fetchInfluencers,
     searchBrands,
@@ -59,13 +60,21 @@ function App() {
   // Load initial data when user logs in
   useEffect(() => {
     if (user && userType) {
-      // Load brands and influencers
-      fetchBrands();
-      fetchInfluencers();
+      // Load brands and influencers with error handling
+      fetchBrands().catch(error => {
+        console.error('Failed to fetch brands:', error);
+      });
+      fetchInfluencers().catch(error => {
+        console.error('Failed to fetch influencers:', error);
+      });
       
-      // Load user-specific data
-      fetchUserCollaborations(user.uid);
-      fetchUserConversations(user.uid);
+      // Load user-specific data with error handling
+      fetchUserCollaborations(user.uid).catch(error => {
+        console.error('Failed to fetch collaborations:', error);
+      });
+      fetchUserConversations(user.uid).catch(error => {
+        console.error('Failed to fetch conversations:', error);
+      });
     }
   }, [user, userType]);
 
@@ -221,6 +230,17 @@ function App() {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-900">Loading SponsorLoop...</h2>
+          {authError && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl max-w-md mx-auto">
+              <p className="text-red-700 text-sm">{authError}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
