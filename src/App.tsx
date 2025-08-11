@@ -75,6 +75,7 @@ function App() {
     const handleNavigateHome = () => setCurrentPage('home');
     const handleShowAIRecommendations = () => setShowAIRecommendations(true);
     const handleShowSmartRecommendations = () => setShowSmartRecommendations(true);
+    const handleGoogleSignUp = () => handleGoogleLogin();
     
     window.addEventListener('openMessages', handleOpenMessages);
     window.addEventListener('openCollaborations', handleOpenCollaborations);
@@ -84,6 +85,7 @@ function App() {
     window.addEventListener('navigateHome', handleNavigateHome);
     window.addEventListener('showAIRecommendations', handleShowAIRecommendations);
     window.addEventListener('showSmartRecommendations', handleShowSmartRecommendations);
+    window.addEventListener('googleSignUp', handleGoogleSignUp);
     
     return () => {
       window.removeEventListener('openMessages', handleOpenMessages);
@@ -94,6 +96,7 @@ function App() {
       window.removeEventListener('navigateHome', handleNavigateHome);
       window.removeEventListener('showAIRecommendations', handleShowAIRecommendations);
       window.removeEventListener('showSmartRecommendations', handleShowSmartRecommendations);
+      window.removeEventListener('googleSignUp', handleGoogleSignUp);
     };
   }, []);
 
