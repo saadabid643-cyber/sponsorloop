@@ -91,13 +91,15 @@ export const useAuth = () => {
     
     try {
       setError(null);
-      console.log('Updating Instagram info for:', user.uid);
+      console.log('🔄 Updating Instagram info in Cloud Firestore for:', user.uid);
       await firebaseAuth.updateInstagramInfo(user.uid, instagramData);
       // Refresh user profile
+      console.log('🔄 Refreshing user profile from Cloud Firestore...');
       const updatedProfile = await firebaseAuth.getUserProfile(user.uid);
       setUserProfile(updatedProfile);
+      console.log('✅ User profile refreshed successfully');
     } catch (error) {
-      console.error('Instagram update error:', error);
+      console.error('❌ Instagram update error:', error);
       setError(error instanceof Error ? error.message : 'Failed to update Instagram info');
       throw error;
     }

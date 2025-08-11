@@ -351,18 +351,18 @@ function App() {
     setInstagramSetupLoading(true);
     
     try {
-      console.log('Updating Instagram info:', instagramData);
+      console.log('🔄 Processing Instagram setup for Cloud Firestore:', instagramData);
       await updateInstagramInfo(instagramData);
       setShowInstagramSetup(false);
       
       // Show success message
       setTimeout(() => {
-        console.log('Instagram setup completed successfully');
-        alert(`Welcome to SponsorLoop! Instagram @${instagramData.username} connected successfully! 🎉`);
+        console.log('🎉 Instagram setup completed successfully');
+        alert(`🎉 Success! Instagram @${instagramData.username} has been connected to your SponsorLoop account and saved to the database!`);
       }, 500);
     } catch (error) {
-      console.error('Instagram setup failed:', error);
-      alert('Failed to connect Instagram. Please try again.');
+      console.error('❌ Instagram setup failed:', error);
+      alert('❌ Failed to save Instagram info to database. Please try again.');
     } finally {
       setInstagramSetupLoading(false);
     }

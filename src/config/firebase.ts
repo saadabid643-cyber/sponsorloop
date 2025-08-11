@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, connectFirestoreEmulator, enableNetwork, disableNetwork } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator, enableNetwork, disableNetwork, connectFirestoreEmulator } from 'firebase/firestore';
 import { getStorage, connectStorageEmulator } from 'firebase/storage';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
@@ -28,8 +28,12 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 
-// Enable Firestore network
-enableNetwork(db).catch(console.error);
+// Enable Firestore network and ensure connection to Cloud Firestore
+enableNetwork(db).then(() => {
+  console.log('✅ Firestore network enabled - Connected to Cloud Firestore');
+}).catch((error) => {
+  console.error('❌ Failed to enable Firestore network:', error);
+});
 
 // Add connection state logging
 auth.onAuthStateChanged((user) => {

@@ -74,7 +74,7 @@ class FirebaseAuthService {
     profileData: any
   ): Promise<UserCredential> {
     try {
-      console.log('Starting registration process...');
+      console.log('🚀 Starting registration process for Cloud Firestore...');
       
       // Validate inputs
       if (!email || !password) {
@@ -148,9 +148,18 @@ class FirebaseAuthService {
       }
 
       // Save to Firestore
-      console.log('Saving profile to Firestore...');
+      console.log('💾 Saving profile to Cloud Firestore...');
       await setDoc(doc(db, 'users', user.uid), userProfile, { merge: true });
-      console.log('Profile saved to Firestore successfully');
+      console.log('✅ Profile saved to Cloud Firestore successfully');
+      
+      // Verify the data was saved
+      console.log('🔍 Verifying data was saved to Cloud Firestore...');
+      const savedDoc = await getDoc(doc(db, 'users', user.uid));
+      if (savedDoc.exists()) {
+        console.log('✅ Data verification successful - Profile exists in Cloud Firestore');
+      } else {
+        console.log('❌ Data verification failed - Profile not found in Cloud Firestore');
+      }
 
       // Update Firebase Auth profile
       console.log('Updating Firebase Auth profile...');
@@ -263,26 +272,32 @@ class FirebaseAuthService {
   // Get user profile
   async getUserProfile(uid: string): Promise<BrandProfile | InfluencerProfile | null> {
     try {
-      console.log('Fetching user profile for:', uid);
+      console.log('📋 Fetching user profile from Cloud Firestore for:', uid);
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        console.log('Profile found in Firestore');
+        console.log('✅ Profile found in Cloud Firestore');
         const data = docSnap.data();
+        console.log('📊 Profile data:', {
+          name: data.name,
+          userType: data.userType,
+          instagramHandle: data.instagramHandle,
+          hasInstagram: !!data.instagramHandle
+        });
         return {
           ...data,
           createdAt: data.createdAt?.toDate() || new Date(),
           updatedAt: data.updatedAt?.toDate() || new Date(),
         } as BrandProfile | InfluencerProfile;
       }
-      console.log('No profile found in Firestore');
+      console.log('❌ No profile found in Cloud Firestore');
       return null;
     } catch (error) {
-      console.error('Get profile error:', error);
+      console.error('❌ Get profile error from Cloud Firestore:', error);
       // Don't throw error for offline issues, return null instead
       if (error instanceof Error && error.message.includes('offline')) {
-        console.log('Client is offline, returning null profile');
+        console.log('📡 Client is offline, returning null profile');
         return null;
       }
       throw error;
@@ -318,7 +333,7 @@ class FirebaseAuthService {
   // Update Instagram information
   async updateInstagramInfo(uid: string, instagramData: { username: string; url: string }): Promise<void> {
     try {
-      console.log('Updating Instagram info for user:', uid, instagramData);
+      console.log('📸 Updating Instagram info in Cloud Firestore for user:', uid, instagramData);
       const docRef = doc(db, 'users', uid);
       await setDoc(docRef, {
         instagramHandle: instagramData.username,
@@ -326,9 +341,22 @@ class FirebaseAuthService {
         updatedAt: new Date(),
       }, { merge: true });
       
-      console.log('Instagram info updated successfully');
+      console.log('✅ Instagram info updated successfully in Cloud Firestore');
+      
+      // Verify the Instagram data was saved
+      console.log('🔍 Verifying Instagram data was saved...');
+      const updatedDoc = await getDoc(docRef);
+      if (updatedDoc.exists()) {
+        const data = updatedDoc.data();
+        console.log('✅ Instagram data verification successful:', {
+          instagramHandle: data.instagramHandle,
+          instagramUrl: data.instagramUrl
+        });
+      } else {
+        console.log('❌ Instagram data verification failed');
+      }
     } catch (error) {
-      console.error('Update Instagram info error:', error);
+      console.error('❌ Update Instagram info error:', error);
       throw error;
     }
   }
