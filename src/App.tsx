@@ -20,7 +20,7 @@ import RegistrationModal from './components/RegistrationModal';
 import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, PageType } from './types';
 
 function App() {
-  const { user, userProfile, loading: authLoading, login, register, logout } = useAuth();
+  const { user, userProfile, loading: authLoading, login, loginWithGoogle, register, logout } = useAuth();
   const { 
     brands, 
     influencers, 
@@ -133,6 +133,20 @@ function App() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+      setShowLogin(false);
+      
+      // Show welcome message
+      setTimeout(() => {
+        alert(`Welcome to SponsorLoop! 🎉`);
+      }, 500);
+    } catch (error) {
+      console.error('Google login failed:', error);
+      alert('Google login failed. Please try again.');
+    }
+  };
   const handleRegister = async (userData: any) => {
     try {
       await register(userData.email, userData.password, registerUserType, userData);
@@ -451,6 +465,7 @@ function App() {
       isOpen={showLogin}
       onClose={() => setShowLogin(false)}
       onLogin={(email, password, userType) => handleLogin(email, password)}
+      onGoogleLogin={handleGoogleLogin}
       onSwitchToRegister={(userType) => {
         setShowLogin(false);
         handleShowRegister(userType);

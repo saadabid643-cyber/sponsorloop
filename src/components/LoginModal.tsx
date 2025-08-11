@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, Eye, EyeOff, User, Building2 } from 'lucide-react';
+import { X, Mail, Lock, Eye, EyeOff, User, Building2, Chrome } from 'lucide-react';
 import { UserType } from '../types';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onLogin: (email: string, password: string) => void;
+  onGoogleLogin?: () => void;
   onSwitchToRegister: (userType: UserType) => void;
 }
 
@@ -13,6 +14,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onLogin,
+  onGoogleLogin,
   onSwitchToRegister,
 }) => {
   const [email, setEmail] = useState('');
@@ -152,6 +154,27 @@ const LoginModal: React.FC<LoginModalProps> = ({
             </button>
           </form>
 
+          {/* Google Sign In */}
+          {onGoogleLogin && (
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+              </div>
+              
+              <button
+                onClick={onGoogleLogin}
+                className="mt-4 w-full flex items-center justify-center space-x-3 px-4 py-3 border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+              >
+                <Chrome size={20} className="text-blue-500" />
+                <span className="font-medium text-gray-700">Sign in with Google</span>
+              </button>
+            </div>
+          )}
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an account?{' '}

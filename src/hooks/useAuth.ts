@@ -37,6 +37,13 @@ export const useAuth = () => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      await firebaseAuth.signInWithGoogle();
+    } catch (error) {
+      throw error;
+    }
+  };
   const register = async (email: string, password: string, userType: 'brand' | 'influencer', profileData: any) => {
     try {
       await firebaseAuth.register(email, password, userType, profileData);
@@ -58,6 +65,7 @@ export const useAuth = () => {
     userProfile,
     loading,
     login,
+    loginWithGoogle,
     register,
     logout
   };

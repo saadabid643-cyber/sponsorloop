@@ -3,6 +3,8 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
   User,
   UserCredential
 } from 'firebase/auth';
@@ -55,6 +57,15 @@ export interface InfluencerProfile extends UserProfile {
 }
 
 class FirebaseAuthService {
+  private googleProvider: GoogleAuthProvider;
+
+  constructor() {
+    this.googleProvider = new GoogleAuthProvider();
+    this.googleProvider.setCustomParameters({
+      prompt: 'select_account'
+    });
+  }
+
   // Register new user
   async register(
     email: string, 
@@ -166,6 +177,53 @@ class FirebaseAuthService {
         }
       }
       
+      throw error;
+    }
+  }
+
+  // Google Sign In
+  async signInWithGoogle(): Promise<UserCredential> {
+    try {
+      const result = await signInWithPopup(auth, this.googleProvider);
+      
+      // Check if user profile exists, if not create one
+      const existingProfile = await this.getUserProfile(result.user.uid);
+      if (!existingProfile) {
+        // Create a basic profile for Google users
+        const userProfile: Partial<BrandProfile | InfluencerProfile> = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          userType: 'influencer', // Default to influencer, can be changed later
+          name: result.user.displayName || 'Google User',
+          username: result.user.email?.split('@')[0] || 'user',
+          bio: '',
+          location: '',
+          website: '',
+          phone: '',
+          avatar: result.user.photoURL || '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          // Influencer defaults
+          niche: ['Lifestyle'],
+          followers: 0,
+          engagement: 3.5,
+          instagramHandle: '',
+          twitterHandle: '',
+          linkedinHandle: '',
+          priceRange: {
+            post: 100,
+            story: 50,
+            reel: 150,
+          },
+          rating: 5.0,
+        };
+
+        await setDoc(doc(db, 'users', result.user.uid), userProfile);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Google sign-in error:', error);
       throw error;
     }
   }
