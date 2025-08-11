@@ -9,8 +9,8 @@ interface HeaderProps {
   isChatOpen: boolean;
   onToggleCart: () => void;
   cartItemCount: number;
-  onShowLogin: () => void;
-  onShowRegister: (userType: UserType) => void;
+  onShowLogin?: () => void;
+  onShowRegister?: (userType: UserType) => void;
   onLogout?: () => void;
   currentUser?: any;
 }
@@ -22,6 +22,8 @@ const Header: React.FC<HeaderProps> = ({
   isChatOpen, 
   onToggleCart, 
   cartItemCount,
+  onShowLogin,
+  onShowRegister,
   onLogout,
   currentUser
 }) => {
@@ -136,14 +138,14 @@ const Header: React.FC<HeaderProps> = ({
           {!currentUser && (
             <div className="flex items-center space-x-3">
               <button
-                onClick={onShowLogin}
+                onClick={() => onShowLogin?.()}
                 className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-purple-600 rounded-xl font-medium transition-all duration-200 hover:bg-purple-50"
               >
                 <LogIn size={18} />
                 <span>Sign In</span>
               </button>
               <button
-                onClick={() => onShowRegister('influencer')}
+                onClick={() => onShowRegister?.('influencer')}
                 className="flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
               >
                 <UserPlus size={18} />
