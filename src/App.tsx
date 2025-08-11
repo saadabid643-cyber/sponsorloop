@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from './hooks/useAuth';
+import { useFirebaseData } from './hooks/useFirebaseData';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Dashboard from './components/Dashboard';
@@ -16,10 +18,23 @@ import SmartRecommendationPopup from './components/SmartRecommendationPopup';
 import LoginModal from './components/LoginModal';
 import RegistrationModal from './components/RegistrationModal';
 import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, PageType } from './types';
-import { mockBrands, mockInfluencers, mockConversations, mockCollaborations } from './data/mockData';
 
 function App() {
-  const [userType, setUserType] = useState<UserType | null>(null);
+  const { user, userProfile, loading: authLoading, login, register, logout } = useAuth();
+  const { 
+    brands, 
+    influencers, 
+    collaborations, 
+    conversations,
+    loading: dataLoading,
+    fetchBrands,
+    fetchInfluencers,
+    searchBrands,
+    searchInfluencers,
+    fetchUserCollaborations,
+    fetchUserConversations
+  } = useFirebaseData();
+  
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [selectedProfile, setSelectedProfile] = useState<Brand | Influencer | null>(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -33,8 +48,23 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [registerUserType, setRegisterUserType] = useState<UserType>('influencer');
-  const [currentUser, setCurrentUser] = useState<any>(null);
   const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
+
+  // Get user type from profile
+  const userType = userProfile?.userType || null;
+
+  // Load initial data when user logs in
+  useEffect(() => {
+    if (user && userType) {
+      // Load brands and influencers
+      fetchBrands();
+      fetchInfluencers();
+      
+      // Load user-specific data
+      fetchUserCollaborations(user.uid);
+      fetchUserConversations(user.uid);
+    }
+  }, [user, userType]);
 
   useEffect(() => {
     const handleOpenMessages = () => setCurrentPage('messages');
@@ -67,8 +97,15 @@ function App() {
     };
   }, []);
 
-  const handleSelectUserType = (type: UserType) => {
-    setUserType(type);
+  const handleSelectUserType = async (type: UserType) => {
+    if (!user) {
+      // If not logged in, show registration modal
+      setRegisterUserType(type);
+      setShowRegister(true);
+      return;
+    }
+    
+    // If logged in, just navigate to dashboard
     setCurrentPage('home');
   };
 
@@ -81,54 +118,133 @@ function App() {
     setShowRegister(true);
   };
 
-  const handleLogin = (email: string, password: string, userType: UserType) => {
-    // Simulate login - in real app, this would call your API
-    const userData = {
-      id: 'user-' + Date.now(),
-      email,
-      userType,
-      name: userType === 'brand' ? 'Demo Brand' : 'Demo Creator',
-      avatar: userType === 'brand' 
-        ? 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400'
-        : 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400'
-    };
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      await login(email, password);
+      setShowLogin(false);
+      
+      // Show welcome message
+      setTimeout(() => {
+        alert(`Welcome back! 🎉`);
+      }, 500);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
+  };
+
+  const handleRegister = async (userData: any) => {
+    try {
+      await register(userData.email, userData.password, registerUserType, userData);
+      setShowRegister(false);
+      
+      // Show welcome message
+      setTimeout(() => {
+        alert(`Welcome to SponsorLoop! 🎉 Your account has been created successfully.`);
+        // Trigger smart recommendations after registration
+        setTimeout(() => {
+          setShowSmartRecommendations(true);
+        }, 2000);
+      }, 500);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setCurrentPage('home');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
+  // Handle search with Firebase
+  const handleSearchChange = async (query: string) => {
+    setSearchQuery(query);
     
-    setCurrentUser(userData);
-    setUserType(userType);
+    if (query.trim()) {
+      if (userType === 'brand') {
+        await searchInfluencers(query, selectedNiche !== 'All' ? selectedNiche : undefined);
+      } else {
+        await searchBrands(query, selectedNiche !== 'All' ? selectedNiche : undefined);
+      }
+    } else {
+      // Reset to all data
+      if (userType === 'brand') {
+        await fetchInfluencers();
+      } else {
+        await fetchBrands();
+      }
+    }
+  };
+
+  // Handle niche change with Firebase
+  const handleNicheChange = async (niche: string) => {
+    setSelectedNiche(niche);
+    
+    if (userType === 'brand') {
+      await searchInfluencers(searchQuery, niche !== 'All' ? niche : undefined);
+    } else {
+      await searchBrands(searchQuery, niche !== 'All' ? niche : undefined);
+    }
+  };
+
+  // Show loading screen while authenticating
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900">Loading SponsorLoop...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogin = (email: string, password: string, selectedUserType: UserType) => {
+    handleLogin(email, password);
+  };
+
+  const handleRegister = (userData: any) => {
+    handleRegister(userData);
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      await login(email, password);
     setShowLogin(false);
     
     // Show welcome message
     setTimeout(() => {
-      alert(`Welcome back, ${userData.name}! 🎉`);
+      alert(`Welcome back! 🎉`);
     }, 500);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
-  const handleRegister = (userData: any) => {
-    // Simulate registration - in real app, this would call your API
-    const newUser = {
-      id: 'user-' + Date.now(),
-      ...userData,
-      avatar: userData.profileImage 
-        ? URL.createObjectURL(userData.profileImage)
-        : (registerUserType === 'brand' 
-          ? 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=400'
-          : 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400'
-        )
-    };
-    
-    setCurrentUser(newUser);
-    setUserType(registerUserType);
+  const handleRegister = async (userData: any) => {
+    try {
+      await register(userData.email, userData.password, registerUserType, userData);
     setShowRegister(false);
     
     // Show welcome message
     setTimeout(() => {
-      alert(`Welcome to SponsorLoop, ${newUser.name}! 🎉 Your account has been created successfully.`);
+      alert(`Welcome to SponsorLoop! 🎉 Your account has been created successfully.`);
       // Trigger AI recommendations after registration
       // Trigger smart recommendations after registration
       setTimeout(() => {
         setShowSmartRecommendations(true);
       }, 2000);
     }, 500);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
   };
 
   const handleProfileClick = (profile: Brand | Influencer) => {
@@ -244,7 +360,6 @@ function App() {
 
   const renderCurrentPage = () => {
     if (!userType) {
-      return <Hero onSelectUserType={handleSelectUserType} />;
       return (
         <Hero 
           onSelectUserType={handleSelectUserType}
@@ -259,7 +374,7 @@ function App() {
         return (
           <MessagesPage
             onBack={handleBackToHome}
-            conversations={mockConversations}
+            conversations={conversations}
             onStartChat={setCurrentConversation}
           />
         );
@@ -267,7 +382,7 @@ function App() {
         return (
           <CollaborationsPage
             onBack={handleBackToHome}
-            collaborations={mockCollaborations}
+            collaborations={collaborations}
           />
         );
       case 'notifications':
@@ -293,13 +408,13 @@ function App() {
         return (
           <Dashboard
             userType={userType}
-            brands={mockBrands}
-            influencers={mockInfluencers}
+            brands={brands}
+            influencers={influencers}
             onProfileClick={handleProfileClick}
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             selectedNiche={selectedNiche}
-            onNicheChange={setSelectedNiche}
+            onNicheChange={handleNicheChange}
             onAddToCart={handleAddToCart}
             onStartChat={handleStartChat}
           />
@@ -318,6 +433,8 @@ function App() {
         cartItemCount={cartItems.length}
         onShowLogin={handleShowLogin}
         onShowRegister={handleShowRegister}
+        onLogout={handleLogout}
+        currentUser={userProfile}
       />
       
       {renderCurrentPage()}
@@ -356,8 +473,8 @@ function App() {
         isOpen={showAIRecommendations}
         onClose={() => setShowAIRecommendations(false)}
         userType={userType}
-        brands={mockBrands}
-        influencers={mockInfluencers}
+        brands={brands}
+        influencers={influencers}
         onProfileClick={handleProfileClick}
         onAddToCart={handleAddToCart}
         onStartChat={handleStartChat}
@@ -367,8 +484,8 @@ function App() {
         isOpen={showSmartRecommendations}
         onClose={() => setShowSmartRecommendations(false)}
         userType={userType}
-        brands={mockBrands}
-        influencers={mockInfluencers}
+        brands={brands}
+        influencers={influencers}
         onProfileClick={handleProfileClick}
         onAddToCart={handleAddToCart}
       />
@@ -376,7 +493,7 @@ function App() {
     <LoginModal
       isOpen={showLogin}
       onClose={() => setShowLogin(false)}
-      onLogin={handleLogin}
+      onLogin={(email, password, userType) => handleLogin(email, password)}
       onSwitchToRegister={(userType) => {
         setShowLogin(false);
         handleShowRegister(userType);

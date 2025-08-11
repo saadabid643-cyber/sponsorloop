@@ -11,6 +11,8 @@ interface HeaderProps {
   cartItemCount: number;
   onShowLogin: () => void;
   onShowRegister: (userType: UserType) => void;
+  onLogout?: () => void;
+  currentUser?: any;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
@@ -20,6 +22,8 @@ const Header: React.FC<HeaderProps> = ({
   isChatOpen, 
   onToggleCart, 
   cartItemCount 
+  onLogout,
+  currentUser
 }) => {
   return (
     <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
@@ -125,6 +129,28 @@ const Header: React.FC<HeaderProps> = ({
               >
                 <MessageCircle size={20} />
               </button>
+            </div>
+          )}
+
+          {/* User Menu */}
+          {currentUser && (
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <img
+                  src={currentUser.avatar || 'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=40&h=40&fit=crop'}
+                  alt={currentUser.name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+                <span className="text-sm font-medium text-gray-700">{currentUser.name}</span>
+              </div>
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="text-sm text-gray-600 hover:text-red-600 transition-colors"
+                >
+                  Logout
+                </button>
+              )}
             </div>
           )}
         </div>

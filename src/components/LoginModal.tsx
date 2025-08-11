@@ -5,7 +5,7 @@ import { UserType } from '../types';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (email: string, password: string, userType: UserType) => void;
+  onLogin: (email: string, password: string) => void;
   onSwitchToRegister: (userType: UserType) => void;
 }
 
@@ -18,7 +18,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState<UserType>('influencer');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,12 +39,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      onLogin(email, password, selectedUserType);
+    try {
+      await onLogin(email, password);
       setIsLoading(false);
-      onClose();
-    }, 1000);
+    } catch (error) {
+      setIsLoading(false);
+      setErrors({ general: 'Login failed. Please check your credentials.' });
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -77,38 +77,14 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
         {/* Content */}
         <div className="p-8">
-          {/* User Type Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">I am a:</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setSelectedUserType('influencer')}
-                className={`flex items-center justify-center space-x-2 p-3 rounded-xl border-2 transition-all ${
-                  selectedUserType === 'influencer'
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <User size={20} />
-                <span className="font-medium">Creator</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedUserType('brand')}
-                className={`flex items-center justify-center space-x-2 p-3 rounded-xl border-2 transition-all ${
-                  selectedUserType === 'brand'
-                    ? 'border-purple-500 bg-purple-50 text-purple-700'
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-              >
-                <Building2 size={20} />
-                <span className="font-medium">Brand</span>
-              </button>
-            </div>
-          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {errors.general && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-red-700 text-sm">{errors.general}</p>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <div className="relative">
@@ -180,7 +156,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
             <p className="text-gray-600">
               Don't have an account?{' '}
               <button
-                onClick={() => onSwitchToRegister(selectedUserType)}
+                onClick={() => onSwitchToRegister('influencer')}
                 className="text-purple-600 font-semibold hover:underline"
               >
                 Sign up here
