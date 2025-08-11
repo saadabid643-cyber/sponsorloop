@@ -63,17 +63,33 @@ class FirebaseAuthService {
     profileData: any
   ): Promise<UserCredential> {
     try {
+      console.log('Starting registration process...');
+      
+      // Validate inputs
+      if (!email || !password) {
+        throw new Error('Email and password are required');
+      }
+      
+      if (!userType) {
+        throw new Error('User type is required');
+      }
+      
       // Create user account
+      console.log('Creating user account with email:', email);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      console.log('User account created successfully:', user.uid);
 
       // Upload profile image if provided
       let avatarUrl = '';
       if (profileData.profileImage) {
+        console.log('Uploading profile image...');
         avatarUrl = await this.uploadProfileImage(user.uid, profileData.profileImage);
+        console.log('Profile image uploaded:', avatarUrl);
       }
 
       // Create user profile document
+      console.log('Creating user profile document...');
       const userProfile: Partial<BrandProfile | InfluencerProfile> = {
         uid: user.uid,
         email: user.email!,
@@ -91,6 +107,7 @@ class FirebaseAuthService {
 
       // Add type-specific fields
       if (userType === 'brand') {
+        console.log('Adding brand-specific fields...');
         Object.assign(userProfile, {
           companyName: profileData.companyName || profileData.name,
           industry: profileData.industry || '',
@@ -102,6 +119,7 @@ class FirebaseAuthService {
           rating: 5.0,
         });
       } else {
+        console.log('Adding influencer-specific fields...');
         Object.assign(userProfile, {
           niche: profileData.niche || ['Lifestyle'],
           followers: parseInt(profileData.followers) || 0,
@@ -119,17 +137,35 @@ class FirebaseAuthService {
       }
 
       // Save to Firestore
+      console.log('Saving profile to Firestore...');
       await setDoc(doc(db, 'users', user.uid), userProfile);
+      console.log('Profile saved to Firestore successfully');
 
       // Update Firebase Auth profile
+      console.log('Updating Firebase Auth profile...');
       await updateProfile(user, {
         displayName: profileData.name,
         photoURL: avatarUrl,
       });
+      console.log('Firebase Auth profile updated successfully');
 
       return userCredential;
     } catch (error) {
       console.error('Registration error:', error);
+      
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('auth/email-already-in-use')) {
+          throw new Error('This email is already registered. Please use a different email or try logging in.');
+        } else if (error.message.includes('auth/weak-password')) {
+          throw new Error('Password is too weak. Please use at least 6 characters.');
+        } else if (error.message.includes('auth/invalid-email')) {
+          throw new Error('Please enter a valid email address.');
+        } else if (error.message.includes('auth/configuration-not-found')) {
+          throw new Error('Firebase Authentication is not properly configured. Please contact support.');
+        }
+      }
+      
       throw error;
     }
   }
