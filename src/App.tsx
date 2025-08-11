@@ -275,9 +275,6 @@ The app will NOT work until you fix the rules!
                   Retry After Fixing Rules
                 </button>
               </div>
-              >
-                Retry
-              </button>
             </div>
           )}
         </div>
