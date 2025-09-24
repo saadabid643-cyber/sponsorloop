@@ -492,7 +492,7 @@ The app will NOT work until you fix the rules!
 
   // Handle privacy policy navigation
   const handleShowPrivacyPolicy = () => {
-    setCurrentPage('privacy');
+    navigate('/privacy');
   };
 
   return (
@@ -510,13 +510,12 @@ The app will NOT work until you fix the rules!
         currentUser={userProfile}
       />
       
-      {renderCurrentPage()}
-      
-      {showPrivacyPolicy && (
-        <PrivacyPolicyPage
-          onBack={() => setShowPrivacyPolicy(false)}
-        />
-      )}
+      <Routes>
+        <Route path="/privacy" element={
+          <PrivacyPolicyPage onBack={() => navigate('/')} />
+        } />
+        <Route path="/*" element={renderCurrentPage()} />
+      </Routes>
 
       {selectedProfile && (
         <ProfileModal
