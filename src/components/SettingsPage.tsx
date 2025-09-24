@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Settings, Bell, Shield, Eye, Globe, CreditCard, HelpCircle, LogOut } from 'lucide-react';
+import { ArrowLeft, Settings, Bell, Shield, Eye, Globe, CreditCard, HelpCircle, LogOut, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface SettingsPageProps {
@@ -296,6 +296,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                 <div>
                   <h3 className="font-semibold text-gray-900">Privacy Policy</h3>
                   <p className="text-sm text-gray-600">View our privacy policy and data practices</p>
+                </div>
+              </button>
+
+              <button 
+                onClick={() => navigate('/delete-data')}
+                className="w-full p-4 bg-red-50 rounded-xl text-left hover:bg-red-100 transition-colors flex items-center space-x-3"
+              >
+                <Trash2 className="w-5 h-5 text-red-600" />
+                <div>
+                  <h3 className="font-semibold text-red-900">Delete My Data</h3>
+                  <p className="text-sm text-red-600">Request deletion of your personal data</p>
                 </div>
               </button>
 

@@ -96,7 +96,7 @@ export interface InstagramData {
 
 export type PageType = 'home' | 'messages' | 'collaborations' | 'profile';
 
-export type PageType = 'home' | 'messages' | 'collaborations' | 'profile' | 'notifications' | 'settings' | 'privacy';
+export type PageType = 'home' | 'messages' | 'collaborations' | 'profile' | 'notifications' | 'settings' | 'privacy' | 'delete-data';
 
 export interface Collaboration {
   id: string;

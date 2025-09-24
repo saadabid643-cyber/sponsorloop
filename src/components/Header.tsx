@@ -187,6 +187,12 @@ const Header: React.FC<HeaderProps> = ({
             >
               Privacy Policy
             </button>
+            <button
+              onClick={() => navigate('/delete-data')}
+              className="hover:text-red-600 transition-colors"
+            >
+              Delete Data
+            </button>
           </div>
         </div>
       </div>

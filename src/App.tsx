@@ -17,6 +17,7 @@ import SettingsPage from './components/SettingsPage';
 import AIRecommendationPopup from './components/AIRecommendationPopup';
 import SmartRecommendationPopup from './components/SmartRecommendationPopup';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import DataDeletionPage from './components/DataDeletionPage';
 import LoginModal from './components/LoginModal';
 import RegistrationModal from './components/RegistrationModal';
 import InstagramSetupModal from './components/InstagramSetupModal';
@@ -504,6 +505,9 @@ The app will NOT work until you fix the rules!
       <Routes>
         <Route path="/privacy" element={
           <PrivacyPolicyPage onBack={() => navigate('/')} />
+        } />
+        <Route path="/delete-data" element={
+          <DataDeletionPage onBack={() => navigate('/')} />
         } />
         <Route path="/*" element={renderCurrentPage()} />
       </Routes>
