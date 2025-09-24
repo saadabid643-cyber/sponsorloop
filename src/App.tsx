@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { useFirebaseData } from './hooks/useFirebaseData';
 import Header from './components/Header';
@@ -22,6 +23,7 @@ import InstagramSetupModal from './components/InstagramSetupModal';
 import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, PageType } from './types';
 
 function App() {
+  const navigate = useNavigate();
   const { user, userProfile, loading: authLoading, error: authError, login, loginWithGoogle, register, logout, updateInstagramInfo } = useAuth();
   const { 
     brands, 
