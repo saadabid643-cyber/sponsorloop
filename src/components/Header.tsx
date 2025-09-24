@@ -175,6 +175,16 @@ const Header: React.FC<HeaderProps> = ({
               )}
             </div>
           )}
+          
+          {/* Footer Links */}
+          <div className="hidden md:flex items-center space-x-4 text-sm text-gray-500">
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('showPrivacyPolicy'))}
+              className="hover:text-purple-600 transition-colors"
+            >
+              Privacy Policy
+            </button>
+          </div>
         </div>
       </div>
     </header>

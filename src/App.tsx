@@ -15,6 +15,7 @@ import ProfilePage from './components/ProfilePage';
 import SettingsPage from './components/SettingsPage';
 import AIRecommendationPopup from './components/AIRecommendationPopup';
 import SmartRecommendationPopup from './components/SmartRecommendationPopup';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import LoginModal from './components/LoginModal';
 import RegistrationModal from './components/RegistrationModal';
 import InstagramSetupModal from './components/InstagramSetupModal';
@@ -53,6 +54,7 @@ function App() {
   const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
   const [showInstagramSetup, setShowInstagramSetup] = useState(false);
   const [instagramSetupLoading, setInstagramSetupLoading] = useState(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   // Get user type from profile
   const userType = userProfile?.userType || null;
@@ -76,6 +78,8 @@ function App() {
     const handleShowSmartRecommendations = () => setShowSmartRecommendations(true);
     const handleGoogleSignUp = () => handleGoogleLogin();
     
+    const handleShowPrivacyPolicy = () => setShowPrivacyPolicy(true);
+    
     window.addEventListener('openMessages', handleOpenMessages);
     window.addEventListener('openCollaborations', handleOpenCollaborations);
     window.addEventListener('openNotifications', handleOpenNotifications);
@@ -85,6 +89,8 @@ function App() {
     window.addEventListener('showAIRecommendations', handleShowAIRecommendations);
     window.addEventListener('showSmartRecommendations', handleShowSmartRecommendations);
     window.addEventListener('googleSignUp', handleGoogleSignUp);
+    
+    window.addEventListener('showPrivacyPolicy', handleShowPrivacyPolicy);
     
     return () => {
       window.removeEventListener('openMessages', handleOpenMessages);
@@ -96,6 +102,7 @@ function App() {
       window.removeEventListener('showAIRecommendations', handleShowAIRecommendations);
       window.removeEventListener('showSmartRecommendations', handleShowSmartRecommendations);
       window.removeEventListener('googleSignUp', handleGoogleSignUp);
+      window.removeEventListener('showPrivacyPolicy', handleShowPrivacyPolicy);
     };
   }, []);
 
@@ -459,6 +466,12 @@ The app will NOT work until you fix the rules!
             onBack={handleBackToHome}
           />
         );
+      case 'privacy':
+        return (
+          <PrivacyPolicyPage
+            onBack={handleBackToHome}
+          />
+        );
       default:
         return (
           <Dashboard
@@ -477,6 +490,11 @@ The app will NOT work until you fix the rules!
     }
   };
 
+  // Handle privacy policy navigation
+  const handleShowPrivacyPolicy = () => {
+    setCurrentPage('privacy');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
       <Header 
@@ -493,6 +511,12 @@ The app will NOT work until you fix the rules!
       />
       
       {renderCurrentPage()}
+      
+      {showPrivacyPolicy && (
+        <PrivacyPolicyPage
+          onBack={() => setShowPrivacyPolicy(false)}
+        />
+      )}
 
       {selectedProfile && (
         <ProfileModal

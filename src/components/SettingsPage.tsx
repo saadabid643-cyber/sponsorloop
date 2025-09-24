@@ -286,6 +286,17 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
                 </div>
               </button>
 
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('showPrivacyPolicy'))}
+                className="w-full p-4 bg-gray-50 rounded-xl text-left hover:bg-gray-100 transition-colors flex items-center space-x-3"
+              >
+                <Shield className="w-5 h-5 text-gray-600" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Privacy Policy</h3>
+                  <p className="text-sm text-gray-600">View our privacy policy and data practices</p>
+                </div>
+              </button>
+
               <button className="w-full p-4 bg-red-50 rounded-xl text-left hover:bg-red-100 transition-colors flex items-center space-x-3">
                 <LogOut className="w-5 h-5 text-red-600" />
                 <div>
