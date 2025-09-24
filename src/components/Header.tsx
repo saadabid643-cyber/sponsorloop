@@ -1,5 +1,6 @@
 import React from 'react';
 import { MessageCircle, User, Building2, Search, Bell, ShoppingCart, LogIn, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { UserType } from '../types';
 
 interface HeaderProps {
@@ -27,6 +28,8 @@ const Header: React.FC<HeaderProps> = ({
   onLogout,
   currentUser
 }) => {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-white/80 backdrop-blur-lg border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -179,7 +182,7 @@ const Header: React.FC<HeaderProps> = ({
           {/* Footer Links */}
           <div className="hidden md:flex items-center space-x-4 text-sm text-gray-500">
             <button
-              onClick={() => window.dispatchEvent(new CustomEvent('showPrivacyPolicy'))}
+              onClick={() => navigate('/privacy')}
               className="hover:text-purple-600 transition-colors"
             >
               Privacy Policy

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Settings, Bell, Shield, Eye, Globe, CreditCard, HelpCircle, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface SettingsPageProps {
   onBack: () => void;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
+  const navigate = useNavigate();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: true,
@@ -287,7 +289,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({ onBack }) => {
               </button>
 
               <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('showPrivacyPolicy'))}
+                onClick={() => navigate('/privacy')}
                 className="w-full p-4 bg-gray-50 rounded-xl text-left hover:bg-gray-100 transition-colors flex items-center space-x-3"
               >
                 <Shield className="w-5 h-5 text-gray-600" />
