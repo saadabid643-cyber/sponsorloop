@@ -170,7 +170,7 @@ function App() {
     }
   };
 
-  const handleFacebookLogin = async () => {
+  const  = async () => {
     try {
       console.log('Starting Facebook login process...');
       const result = await loginWithFacebook();
