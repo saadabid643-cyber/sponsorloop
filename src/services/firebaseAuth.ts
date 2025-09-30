@@ -13,6 +13,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../config/firebase';
 import { UserType } from '../types';
+import { FACEBOOK_APP_ID } from '../config/firebase';
 
 export interface UserProfile {
   uid: string;
@@ -67,12 +68,16 @@ class FirebaseAuthService {
       prompt: 'select_account'
     });
     
+    // Facebook Provider Configuration with your App ID
     this.facebookProvider = new FacebookAuthProvider();
     this.facebookProvider.setCustomParameters({
-      display: 'popup'
+      display: 'popup',
+      app_id: FACEBOOK_APP_ID // Using your Facebook App ID: 1306255877566568
     });
     this.facebookProvider.addScope('email');
     this.facebookProvider.addScope('public_profile');
+    
+    console.log('Facebook Provider initialized with App ID:', FACEBOOK_APP_ID);
   }
 
   // Register new user

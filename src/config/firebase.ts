@@ -14,6 +14,9 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-V8CK3M9FND"
 };
 
+// Facebook App Configuration
+export const FACEBOOK_APP_ID = '1306255877566568'; // Your Facebook App ID
+
 console.log('Firebase Config:', {
   projectId: firebaseConfig.projectId,
   authDomain: firebaseConfig.authDomain,

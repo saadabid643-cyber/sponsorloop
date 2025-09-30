@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, Eye, EyeOff, User, Building2, Chrome, Facebook } from 'lucide-react';
 import { UserType } from '../types';
+import FacebookLoginButton from './FacebookLoginButton';
+import { FACEBOOK_APP_ID } from '../config/firebase';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -25,6 +27,10 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Log Facebook App ID for debugging
+  React.useEffect(() => {
+    console.log('Facebook App ID being used:', FACEBOOK_APP_ID);
+  }, []);
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
@@ -187,13 +193,10 @@ const LoginModal: React.FC<LoginModalProps> = ({
                 )}
                 
                 {onFacebookLogin && (
-                  <button
-                    onClick={onFacebookLogin}
-                    className="w-full flex items-center justify-center space-x-3 px-4 py-3 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl hover:shadow-md transition-all duration-200 group"
-                  >
-                    <Facebook className="w-5 h-5" />
-                    <span className="font-medium">Continue with Facebook</span>
-                  </button>
+                  <FacebookLoginButton 
+                    onLogin={onFacebookLogin}
+                    text="Continue with Facebook"
+                  />
                 )}
               </div>
             </div>
@@ -213,6 +216,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
           {/* Demo Accounts */}
           <div className="mt-6 p-4 bg-gray-50 rounded-xl">
             <h4 className="font-semibold text-gray-900 mb-2">Demo Accounts</h4>
+            <p className="text-xs text-gray-500 mb-2">Facebook App ID: {FACEBOOK_APP_ID}</p>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Creator:</span>
