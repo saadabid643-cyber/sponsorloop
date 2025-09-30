@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SponsorLoop - Brand &amp; Influencer Marketplace</title>
+    
+    <!-- Facebook SDK -->
+    <script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1306255877566568',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v18.0'
+        });
+          
+        FB.AppEvents.logPageView();   
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>

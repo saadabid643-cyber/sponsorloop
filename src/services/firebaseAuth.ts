@@ -5,6 +5,7 @@ import {
   updateProfile,
   signInWithPopup,
   GoogleAuthProvider,
+  FacebookAuthProvider,
   User,
   UserCredential
 } from 'firebase/auth';
@@ -58,12 +59,20 @@ export interface InfluencerProfile extends UserProfile {
 
 class FirebaseAuthService {
   private googleProvider: GoogleAuthProvider;
+  private facebookProvider: FacebookAuthProvider;
 
   constructor() {
     this.googleProvider = new GoogleAuthProvider();
     this.googleProvider.setCustomParameters({
       prompt: 'select_account'
     });
+    
+    this.facebookProvider = new FacebookAuthProvider();
+    this.facebookProvider.setCustomParameters({
+      display: 'popup'
+    });
+    this.facebookProvider.addScope('email');
+    this.facebookProvider.addScope('public_profile');
   }
 
   // Register new user
@@ -250,6 +259,61 @@ class FirebaseAuthService {
     }
   }
 
+  // Facebook Sign In
+  async signInWithFacebook(): Promise<UserCredential> {
+    try {
+      console.log('Starting Facebook sign-in...');
+      const result = await signInWithPopup(auth, this.facebookProvider);
+      console.log('Facebook sign-in successful:', result.user.email);
+      
+      // Check if user profile exists, if not create one
+      console.log('Checking for existing profile...');
+      const existingProfile = await this.getUserProfile(result.user.uid);
+      
+      if (!existingProfile) {
+        console.log('Creating new profile for Facebook user...');
+        // Create a basic profile for Facebook users
+        const userProfile: Partial<BrandProfile | InfluencerProfile> = {
+          uid: result.user.uid,
+          email: result.user.email!,
+          userType: 'influencer', // Default to influencer, can be changed later
+          name: result.user.displayName || 'Facebook User',
+          username: result.user.email?.split('@')[0] || 'user',
+          bio: '',
+          location: '',
+          website: '',
+          phone: '',
+          avatar: result.user.photoURL || '',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          // Influencer defaults
+          niche: ['Lifestyle'],
+          followers: 0,
+          engagement: 3.5,
+          instagramHandle: '',
+          twitterHandle: '',
+          linkedinHandle: '',
+          priceRange: {
+            post: 100,
+            story: 50,
+            reel: 150,
+          },
+          rating: 5.0,
+        };
+
+        console.log('Saving new Facebook user profile...');
+        await setDoc(doc(db, 'users', result.user.uid), userProfile);
+        console.log('Profile saved successfully');
+      } else {
+        console.log('Existing profile found');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Facebook sign-in error:', error);
+      throw error;
+    }
+  }
   // Login user
   async login(email: string, password: string): Promise<UserCredential> {
     try {

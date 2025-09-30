@@ -25,7 +25,7 @@ import { UserType, Brand, Influencer, CartItem, ChatConversation, ChatMessage, P
 
 function App() {
   const navigate = useNavigate();
-  const { user, userProfile, loading: authLoading, error: authError, login, loginWithGoogle, register, logout, updateInstagramInfo } = useAuth();
+  const { user, userProfile, loading: authLoading, error: authError, login, loginWithGoogle, loginWithFacebook, register, logout, updateInstagramInfo } = useAuth();
   const { 
     brands, 
     influencers, 
@@ -79,6 +79,7 @@ function App() {
     const handleShowAIRecommendations = () => setShowAIRecommendations(true);
     const handleShowSmartRecommendations = () => setShowSmartRecommendations(true);
     const handleGoogleSignUp = () => handleGoogleLogin();
+    const handleFacebookSignUp = () => handleFacebookLogin();
     
     window.addEventListener('openMessages', handleOpenMessages);
     window.addEventListener('openCollaborations', handleOpenCollaborations);
@@ -89,6 +90,7 @@ function App() {
     window.addEventListener('showAIRecommendations', handleShowAIRecommendations);
     window.addEventListener('showSmartRecommendations', handleShowSmartRecommendations);
     window.addEventListener('googleSignUp', handleGoogleSignUp);
+    window.addEventListener('facebookSignUp', handleFacebookSignUp);
     
     return () => {
       window.removeEventListener('openMessages', handleOpenMessages);
@@ -100,6 +102,7 @@ function App() {
       window.removeEventListener('showAIRecommendations', handleShowAIRecommendations);
       window.removeEventListener('showSmartRecommendations', handleShowSmartRecommendations);
       window.removeEventListener('googleSignUp', handleGoogleSignUp);
+      window.removeEventListener('facebookSignUp', handleFacebookSignUp);
     };
   }, []);
 
@@ -167,6 +170,33 @@ function App() {
     }
   };
 
+  const handleFacebookLogin = async () => {
+    try {
+      console.log('Starting Facebook login process...');
+      const result = await loginWithFacebook();
+      console.log('Facebook login result:', result);
+      
+      setShowLogin(false);
+      
+      // Always show Instagram setup for Facebook users
+      console.log('Showing Instagram setup modal...');
+      setTimeout(() => {
+        setShowInstagramSetup(true);
+      }, 100);
+      
+    } catch (error) {
+      console.error('Facebook login failed:', error);
+      
+      let errorMessage = 'Facebook login failed. Please try again.';
+      if (error instanceof Error) {
+        if (error.message.includes('Database access denied') || error.message.includes('permissions')) {
+          errorMessage = '🚨 Database Error: Please update Firestore security rules in Firebase Console to allow authenticated users. Check the console for details.';
+        }
+      }
+      
+      alert(errorMessage);
+    }
+  };
   // Show Firestore rules error prominently
   const showFirestoreRulesError = () => {
     const errorMessage = `
@@ -568,6 +598,7 @@ The app will NOT work until you fix the rules!
       onClose={() => setShowLogin(false)}
       onLogin={(email, password, userType) => handleLogin(email, password)}
       onGoogleLogin={handleGoogleLogin}
+      onFacebookLogin={handleFacebookLogin}
       onSwitchToRegister={(userType) => {
         setShowLogin(false);
         handleShowRegister(userType);

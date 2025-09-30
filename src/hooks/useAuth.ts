@@ -63,6 +63,20 @@ export const useAuth = () => {
       throw error;
     }
   };
+  
+  const loginWithFacebook = async () => {
+    try {
+      setError(null);
+      console.log('Attempting Facebook login...');
+      const result = await firebaseAuth.signInWithFacebook();
+      console.log('Facebook login completed successfully');
+      return result;
+    } catch (error) {
+      console.error('Facebook login error:', error);
+      setError(error instanceof Error ? error.message : 'Facebook login failed');
+      throw error;
+    }
+  };
   const register = async (email: string, password: string, userType: 'brand' | 'influencer', profileData: any) => {
     try {
       setError(null);
@@ -111,6 +125,7 @@ export const useAuth = () => {
     error,
     login,
     loginWithGoogle,
+    loginWithFacebook,
     register,
     logout,
     updateInstagramInfo
