@@ -84,8 +84,8 @@ class FirebaseAuthService {
     this.facebookProvider.addScope('instagram_manage_insights');
     this.facebookProvider.addScope('instagram_manage_comments');
     this.facebookProvider.addScope('instagram_content_publish');
-    this.facebookProvider.addScope('pages_read_management');
-    this.facebookProvider.addScope('pages_read_metadata');
+    this.facebookProvider.addScope('pages_read_engagement');
+    this.facebookProvider.addScope('pages_read_user_content');
     this.facebookProvider.addScope('business_management');
     
     console.log('Facebook Provider initialized with App ID:', FACEBOOK_APP_ID);
