@@ -40,7 +40,7 @@ const FacebookLoginButton: React.FC<FacebookLoginButtonProps> = ({
         console.log('Facebook login cancelled or failed');
       }
     }, { 
-      scope: 'email,public_profile',
+      scope: 'email,public_profile,instagram_basic,pages_show_list,instagram_manage_insights,instagram_manage_comments,instagram_content_publish,pages_read_management,pages_read_metadata,business_management',
       return_scopes: true 
     });
   };

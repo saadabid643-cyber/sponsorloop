@@ -74,8 +74,19 @@ class FirebaseAuthService {
       display: 'popup',
       app_id: FACEBOOK_APP_ID // Using your Facebook App ID: 1306255877566568
     });
+    // Basic Facebook permissions
     this.facebookProvider.addScope('email');
     this.facebookProvider.addScope('public_profile');
+    
+    // Instagram permissions for content management and insights
+    this.facebookProvider.addScope('instagram_basic');
+    this.facebookProvider.addScope('pages_show_list');
+    this.facebookProvider.addScope('instagram_manage_insights');
+    this.facebookProvider.addScope('instagram_manage_comments');
+    this.facebookProvider.addScope('instagram_content_publish');
+    this.facebookProvider.addScope('pages_read_management');
+    this.facebookProvider.addScope('pages_read_metadata');
+    this.facebookProvider.addScope('business_management');
     
     console.log('Facebook Provider initialized with App ID:', FACEBOOK_APP_ID);
   }
