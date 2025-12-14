@@ -119,26 +119,26 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ isOpen, onToggle, userTyp
     return (
       <button
         onClick={onToggle}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 z-40 will-change-transform animate-pulse"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 sm:p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-110 transition-all duration-200 z-40 will-change-transform animate-pulse"
       >
-        <MessageCircle size={24} />
+        <MessageCircle size={20} className="sm:w-6 sm:h-6" />
         <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col z-50">
+    <div className="fixed bottom-0 right-0 sm:bottom-4 sm:right-4 md:bottom-6 md:right-6 w-full sm:w-96 h-[100vh] sm:h-[600px] bg-white sm:rounded-2xl shadow-2xl border-t sm:border border-gray-200 flex flex-col z-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-            <Bot size={18} />
+      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 sm:p-4 sm:rounded-t-2xl flex items-center justify-between">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <Bot size={16} className="sm:w-[18px] sm:h-[18px]" />
           </div>
           <div>
-            <h3 className="font-semibold">AI Assistant</h3>
-            <p className="text-xs opacity-90">
-              <button 
+            <h3 className="text-sm sm:text-base font-semibold">AI Assistant</h3>
+            <p className="text-[10px] sm:text-xs opacity-90">
+              <button
                 onClick={() => window.dispatchEvent(new CustomEvent('openSettings'))}
                 className="hover:underline"
               >

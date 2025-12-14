@@ -24,22 +24,22 @@ const Cart: React.FC<CartProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full max-h-[90vh] sm:max-h-[80vh] overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <ShoppingCart size={24} />
-            <h2 className="text-2xl font-bold">Your Cart</h2>
-            <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 sm:p-4 md:p-6 flex items-center justify-between">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <ShoppingCart size={20} className="sm:w-6 sm:h-6" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold">Your Cart</h2>
+            <span className="bg-white/20 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium">
               {items.length} {items.length === 1 ? 'item' : 'items'}
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors duration-200"
+            className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors duration-200"
           >
-            <X size={24} />
+            <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
